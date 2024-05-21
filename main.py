@@ -13,6 +13,7 @@ try:
 except Exception as e:
     print(e)
 
+from keepalive import keepalive
 from gnews import GNews
 import requests
 from bs4 import BeautifulSoup
@@ -130,11 +131,14 @@ def main():
 
     # Convert DataFrame to list of dictionaries and insert into MongoDB
     records = df.to_dict('records')
+    total_article_count = 0
     duplicate_count = 0
     status = "Done"
 
     try:
         for record in records:
+            total_article_count += 1
+
             result = collection.update_one({"url": record["url"]},
                                            {"$setOnInsert": record},
                                            upsert=True)
@@ -147,12 +151,15 @@ def main():
 
     scraper_info.insert_one({
         "Time": datetime.now(),
+        "Total articles": total_article_count,
         "Duplicate articles": duplicate_count,
         "Status": status
     })
 
     print(f"{status}\nData scraping will continue in 3 hours.")
 
+
+keepalive()
 
 # "Scheduling the main function
 schedule.every(3).hours.do(main)
