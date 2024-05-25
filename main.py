@@ -161,8 +161,8 @@ def main():
 
 keepalive()
 
-# "Scheduling the main function
-schedule.every(3).hours.do(main)
+# Scheduling the main function
+schedule.every(1).hour.do(main)
 
 # Start the loop to run on schedule.
 while True:
